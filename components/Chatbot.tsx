@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { MessageCircle, X, Send, Bot } from 'lucide-react';
 import { sendMessageToGemini } from '../services/geminiService';
 import { ChatMessage } from '../types';
@@ -29,7 +30,6 @@ const Chatbot: React.FC = () => {
   const toggleChat = () => {
     const nextState = !isOpen;
     if (nextState) {
-      // Reset to initial message when opening to ensure the greeting is always first
       setMessages([INITIAL_MESSAGE]);
       setInput('');
       setIsLoading(false);
@@ -46,7 +46,6 @@ const Chatbot: React.FC = () => {
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setIsLoading(true);
 
-    // Prepare history for API
     const apiHistory = messages
       .filter((msg, index) => !(index === 0 && msg.role === 'model'))
       .map(m => ({
@@ -60,20 +59,30 @@ const Chatbot: React.FC = () => {
     setIsLoading(false);
   };
 
-  return (
+  // Use Portal to render directly into body, bypassing all parent stacking contexts
+  return createPortal(
     <div 
-      className="fixed bottom-4 right-4 z-[9999] flex flex-col items-end gap-4 font-sans"
-      style={{ position: 'fixed', bottom: '1rem', right: '1rem', zIndex: 9999 }}
+      style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        zIndex: 99999, // Extremely high z-index to stay on top of everything
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-end',
+        gap: '16px',
+        fontFamily: '"Lato", sans-serif'
+      }}
     >
       {/* Chat Window */}
       {isOpen && (
         <div 
           className="bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 animate-fade-in-up"
           style={{ 
-            width: 'calc(100vw - 2rem)', // Mobile width: full width minus margin
-            maxWidth: '380px',            // Desktop/Tablet max width
+            width: 'calc(100vw - 40px)', // Full width minus margins on mobile
+            maxWidth: '380px',           // Fixed max width on desktop
             height: '500px', 
-            maxHeight: '70vh'             // Prevent it from being too tall on mobile
+            maxHeight: '70vh'            // Max height relative to viewport
           }}
         >
           {/* Header (Mobile Only Close) */}
@@ -153,7 +162,7 @@ const Chatbot: React.FC = () => {
         </div>
       )}
 
-      {/* Button & Label Container */}
+      {/* Toggle Button */}
       <div className="flex items-center gap-3">
         {!isOpen && (
           <div className="hidden sm:block bg-white text-brand-dark px-4 py-2 rounded-full shadow-lg font-bold text-sm border border-gray-100 animate-fade-in-up">
@@ -168,7 +177,8 @@ const Chatbot: React.FC = () => {
           {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
