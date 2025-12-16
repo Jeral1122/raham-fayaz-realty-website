@@ -32,7 +32,7 @@ const About: React.FC = () => {
 
           {/* Text Side */}
           <div className="order-1 lg:order-2">
-            <h2 className="text-brand-gold font-bold tracking-widest uppercase text-sm mb-2">Meet Your Agent</h2>
+            <h2 className="text-brand-gold font-bold tracking-widest uppercase text-sm mb-2">Meet Your Real Estate Agent</h2>
             <h3 className="text-4xl font-serif font-bold text-brand-dark mb-6">Raham Fayaz</h3>
             
             <div className="space-y-4 text-gray-600 leading-relaxed font-sans text-lg">
