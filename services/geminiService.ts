@@ -1,17 +1,24 @@
 import { GoogleGenAI, FunctionDeclaration, Type } from "@google/genai";
 import { SYSTEM_INSTRUCTION } from "../constants";
 
+// --- API KEY CONFIGURATION ---
+const MANUAL_API_KEY = "AIzaSyDsHXhRQR9W2NVcrohI5rSKoTxi37m4Bc4";
+// -----------------------------
+
 let aiClient: GoogleGenAI | null = null;
 
 const getApiKey = (): string => {
-  // Check standard process.env (Node/Webpack/CRA)
+  // 1. Check Manual Key (Highest Priority)
+  if (MANUAL_API_KEY) return MANUAL_API_KEY;
+
+  // 2. Check standard process.env (Node/Webpack/CRA)
   if (typeof process !== 'undefined' && process.env) {
     if (process.env.API_KEY) return process.env.API_KEY;
     if (process.env.REACT_APP_API_KEY) return process.env.REACT_APP_API_KEY;
     if (process.env.VITE_API_KEY) return process.env.VITE_API_KEY;
   }
   
-  // Check import.meta.env (Vite/Modern Browsers)
+  // 3. Check import.meta.env (Vite/Modern Browsers)
   // @ts-ignore
   if (typeof import.meta !== 'undefined' && import.meta.env) {
     // @ts-ignore
@@ -26,13 +33,7 @@ const getApiKey = (): string => {
 const getClient = (): GoogleGenAI => {
   if (!aiClient) {
     const apiKey = getApiKey();
-    
-    if (!apiKey) {
-      console.warn("Gemini API Key is missing. Please check your Vercel Environment Variables.");
-    }
-    
-    // We initialize even without a key so we can catch the specific error later
-    aiClient = new GoogleGenAI({ apiKey });
+    aiClient = new GoogleGenAI({ apiKey: apiKey });
   }
   return aiClient;
 };
@@ -93,31 +94,24 @@ export const sendMessageToGemini = async (
     });
 
     // Handle Function Calls
-    const candidates = result.candidates;
-    if (candidates && candidates.length > 0) {
-        const parts = candidates[0].content?.parts;
-        if (parts) {
-            const functionCalls = parts.filter(part => part.functionCall);
-            if (functionCalls.length > 0) {
-              const call = functionCalls[0].functionCall;
-              if (call && call.name === 'submit_inquiry') {
-                const { name, contact_info, inquiry_type } = call.args as any;
-                
-                // Logging for verification
-                console.log(`Lead Captured: ${name}, ${contact_info}, ${inquiry_type}`);
+    if (result.functionCalls && result.functionCalls.length > 0) {
+      const call = result.functionCalls[0];
+      if (call.name === 'submit_inquiry') {
+        const { name, contact_info, inquiry_type } = call.args as any;
+        
+        // Logging for verification
+        console.log(`Lead Captured: ${name}, ${contact_info}, ${inquiry_type}`);
 
-                result = await chat.sendMessage({
-                  message: [{
-                    functionResponse: {
-                      name: 'submit_inquiry',
-                      id: call.id,
-                      response: { result: 'success', message: 'Inquiry sent successfully.' }
-                    }
-                  }]
-                });
-              }
+        result = await chat.sendMessage({
+          message: [{
+            functionResponse: {
+              name: 'submit_inquiry',
+              id: call.id,
+              response: { result: 'success', message: 'Inquiry sent successfully.' }
             }
-        }
+          }]
+        });
+      }
     }
 
     const responseText = result.text;
@@ -129,14 +123,7 @@ export const sendMessageToGemini = async (
 
   } catch (error: any) {
     console.error("Gemini API Error:", error);
-    
     const errorMessage = error.message || error.toString();
-    
-    // Explicitly tell the user if the key is missing
-    if (errorMessage.includes("API key")) {
-        return "⚠️ Configuration Error: The Gemini API Key is missing. Please add 'API_KEY' or 'VITE_API_KEY' to your Vercel Environment Variables.";
-    }
-    
-    return `Connection Error: ${errorMessage}. Please contact Raham directly at 248-238-1703.`;
+    return `Connection Error: ${errorMessage}. Please check your internet connection or contact Raham directly.`;
   }
 };
