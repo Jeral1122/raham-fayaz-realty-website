@@ -6,13 +6,11 @@ let aiClient: GoogleGenAI | null = null;
 const getClient = (): GoogleGenAI => {
   if (!aiClient) {
     // Safely access process.env.API_KEY
-    // In some browser environments 'process' might be undefined, so we check typeof first.
+    // We check multiple potential sources for the key to be robust
     const apiKey = (typeof process !== 'undefined' && process.env && process.env.API_KEY) || '';
     
-    if (!apiKey) {
-      console.warn("Gemini API Key is missing. Please check your environment variables.");
-    }
-    
+    // If no key is found, we don't throw yet, we let the client try to initialize 
+    // so the specific SDK error can be caught later if it fails.
     aiClient = new GoogleGenAI({ apiKey });
   }
   return aiClient;
@@ -49,12 +47,10 @@ export const sendMessageToGemini = async (
   try {
     const ai = getClient();
     
-    // Validate message
     if (!message || typeof message !== 'string') {
       return "I didn't catch that. Could you say it again?";
     }
 
-    // Safely map history
     const formattedHistory = Array.isArray(history) 
       ? history.map(h => ({
           role: h.role,
@@ -62,7 +58,6 @@ export const sendMessageToGemini = async (
         }))
       : [];
 
-    // Create chat with tool configuration
     const chat = ai.chats.create({
       model: 'gemini-2.5-flash',
       config: {
@@ -72,12 +67,11 @@ export const sendMessageToGemini = async (
       history: formattedHistory
     });
 
-    // Send the message
     let result = await chat.sendMessage({
       message: message
     });
 
-    // Handle Function Calls (if the model decides to capture a lead)
+    // Handle Function Calls
     const candidates = result.candidates;
     if (candidates && candidates.length > 0) {
         const parts = candidates[0].content?.parts;
@@ -88,22 +82,15 @@ export const sendMessageToGemini = async (
               if (call && call.name === 'submit_inquiry') {
                 const { name, contact_info, inquiry_type } = call.args as any;
                 
-                // --- SIMULATE API CALL / EMAIL SENDING ---
-                console.log("-----------------------------------------");
-                console.log("🚀 AI LEAD CAPTURED:");
-                console.log(`Name: ${name}`);
-                console.log(`Contact: ${contact_info}`);
-                console.log(`Type: ${inquiry_type}`);
-                console.log("-----------------------------------------");
-                // ------------------------------------------
+                // Logging for verification
+                console.log(`Lead Captured: ${name}, ${contact_info}, ${inquiry_type}`);
 
-                // Send the tool response back to the model
                 result = await chat.sendMessage({
                   message: [{
                     functionResponse: {
                       name: 'submit_inquiry',
                       id: call.id,
-                      response: { result: 'success', message: 'Inquiry sent to Raham successfully.' }
+                      response: { result: 'success', message: 'Inquiry sent successfully.' }
                     }
                   }]
                 });
@@ -112,7 +99,6 @@ export const sendMessageToGemini = async (
         }
     }
 
-    // Safely extract text
     const responseText = result.text;
     if (responseText) {
         return responseText;
@@ -120,15 +106,18 @@ export const sendMessageToGemini = async (
     
     return "I've noted that down. Is there anything else I can help you with?";
 
-  } catch (error) {
-    // Log detailed error for debugging
-    console.error("Gemini API Error Details:", error);
+  } catch (error: any) {
+    console.error("Gemini API Error:", error);
     
-    // Check if error is related to API Key
-    if (error instanceof Error && (error.message.includes("API key") || error.message.includes("403") || error.message.includes("400"))) {
-       return "I'm having trouble connecting to my brain (API Key Issue). Please contact Raham directly at 248-238-1703.";
+    // Extract the exact error message to help user debug
+    const errorMessage = error.message || error.toString();
+    
+    // Check for specific API Key error
+    if (errorMessage.includes("API key")) {
+        return "System Error: The API Key is invalid or missing. Please check your Vercel Environment Variables.";
     }
-
-    return "I am currently experiencing high traffic. Please try again later or contact Raham directly.";
+    
+    // Return the actual error message so we know what's wrong
+    return `Connection Error: ${errorMessage}. Please contact Raham directly at 248-238-1703.`;
   }
 };

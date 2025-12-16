@@ -8,14 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script>
       // Polyfill process.env for browser environments to prevent crashes
-      window.process = {
-        env: {
-          NODE_ENV: 'development',
-          // Note: In a real Vercel deployment, the build process typically replaces process.env.API_KEY 
-          // with the actual value if configured correctly. This shim prevents 'process is not defined' errors.
-          API_KEY: '', 
-        }
-      };
+      // We do NOT set API_KEY here to avoid overwriting the build system's injection
+      if (typeof window.process === 'undefined') {
+        window.process = {
+          env: {
+            NODE_ENV: 'development'
+          }
+        };
+      }
       
       tailwind.config = {
         theme: {
