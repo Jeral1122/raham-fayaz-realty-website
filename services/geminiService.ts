@@ -3,14 +3,35 @@ import { SYSTEM_INSTRUCTION } from "../constants";
 
 let aiClient: GoogleGenAI | null = null;
 
+const getApiKey = (): string => {
+  // Check standard process.env (Node/Webpack/CRA)
+  if (typeof process !== 'undefined' && process.env) {
+    if (process.env.API_KEY) return process.env.API_KEY;
+    if (process.env.REACT_APP_API_KEY) return process.env.REACT_APP_API_KEY;
+    if (process.env.VITE_API_KEY) return process.env.VITE_API_KEY;
+  }
+  
+  // Check import.meta.env (Vite/Modern Browsers)
+  // @ts-ignore
+  if (typeof import.meta !== 'undefined' && import.meta.env) {
+    // @ts-ignore
+    if (import.meta.env.API_KEY) return import.meta.env.API_KEY;
+    // @ts-ignore
+    if (import.meta.env.VITE_API_KEY) return import.meta.env.VITE_API_KEY;
+  }
+
+  return '';
+};
+
 const getClient = (): GoogleGenAI => {
   if (!aiClient) {
-    // Safely access process.env.API_KEY
-    // We check multiple potential sources for the key to be robust
-    const apiKey = (typeof process !== 'undefined' && process.env && process.env.API_KEY) || '';
+    const apiKey = getApiKey();
     
-    // If no key is found, we don't throw yet, we let the client try to initialize 
-    // so the specific SDK error can be caught later if it fails.
+    if (!apiKey) {
+      console.warn("Gemini API Key is missing. Please check your Vercel Environment Variables.");
+    }
+    
+    // We initialize even without a key so we can catch the specific error later
     aiClient = new GoogleGenAI({ apiKey });
   }
   return aiClient;
@@ -109,15 +130,13 @@ export const sendMessageToGemini = async (
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     
-    // Extract the exact error message to help user debug
     const errorMessage = error.message || error.toString();
     
-    // Check for specific API Key error
+    // Explicitly tell the user if the key is missing
     if (errorMessage.includes("API key")) {
-        return "System Error: The API Key is invalid or missing. Please check your Vercel Environment Variables.";
+        return "⚠️ Configuration Error: The Gemini API Key is missing. Please add 'API_KEY' or 'VITE_API_KEY' to your Vercel Environment Variables.";
     }
     
-    // Return the actual error message so we know what's wrong
     return `Connection Error: ${errorMessage}. Please contact Raham directly at 248-238-1703.`;
   }
 };
