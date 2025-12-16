@@ -2,7 +2,9 @@ import { GoogleGenAI, FunctionDeclaration, Type } from "@google/genai";
 import { SYSTEM_INSTRUCTION } from "../constants";
 
 // --- API KEY CONFIGURATION ---
-const MANUAL_API_KEY = "AIzaSyDsHXhRQR9W2NVcrohI5rSKoTxi37m4Bc4";
+// The previous key was blocked by Google. 
+// Get a NEW key from https://aistudio.google.com/app/apikey and paste it inside the quotes below:
+const MANUAL_API_KEY = "AIzaSyCw24Ro8sLaWLwtIhYLwLvKGIbFcCRfyKg";
 // -----------------------------
 
 let aiClient: GoogleGenAI | null = null;
@@ -124,6 +126,12 @@ export const sendMessageToGemini = async (
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     const errorMessage = error.message || error.toString();
+    
+    // Check for leaked key error specifically
+    if (errorMessage.includes("leaked") || errorMessage.includes("403")) {
+      return "⚠️ Access Denied: The API Key has been blocked by Google because it was found publicly. Please generate a NEW key at aistudio.google.com and update the 'MANUAL_API_KEY' in the code.";
+    }
+
     return `Connection Error: ${errorMessage}. Please check your internet connection or contact Raham directly.`;
   }
 };
