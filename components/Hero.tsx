@@ -9,9 +9,9 @@ const Hero: React.FC = () => {
 
   return (
     <section id={SectionId.HOME} className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
-      {/* Fixed Background Image with Overlay */}
+      {/* Fixed Background Image with Overlay - bg-fixed disabled on mobile to prevent z-index glitches */}
       <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat bg-fixed"
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat bg-scroll md:bg-fixed"
         style={{ 
           backgroundImage: 'url("https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2000&auto=format&fit=crop")' 
         }}

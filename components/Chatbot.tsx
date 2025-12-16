@@ -47,8 +47,6 @@ const Chatbot: React.FC = () => {
     setIsLoading(true);
 
     // Prepare history for API
-    // IMPORTANT: Filter out the initial simulated welcome message if it exists at index 0
-    // This ensures the API history starts cleanly with the user's first real input or valid history.
     const apiHistory = messages
       .filter((msg, index) => !(index === 0 && msg.role === 'model'))
       .map(m => ({
@@ -63,27 +61,48 @@ const Chatbot: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4">
+    <div 
+      className="fixed bottom-4 right-4 z-[9999] flex flex-col items-end gap-4 font-sans"
+      style={{ position: 'fixed', bottom: '1rem', right: '1rem', zIndex: 9999 }}
+    >
       {/* Chat Window */}
       {isOpen && (
-        <div className="w-80 sm:w-96 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 animate-fade-in-up h-[450px]">
+        <div 
+          className="bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 animate-fade-in-up"
+          style={{ 
+            width: 'calc(100vw - 2rem)', // Mobile width: full width minus margin
+            maxWidth: '380px',            // Desktop/Tablet max width
+            height: '500px', 
+            maxHeight: '70vh'             // Prevent it from being too tall on mobile
+          }}
+        >
+          {/* Header (Mobile Only Close) */}
+          <div className="bg-brand-dark p-3 flex justify-between items-center sm:hidden">
+            <span className="text-white font-bold text-sm flex items-center gap-2">
+              <Bot size={16} className="text-brand-gold"/> 
+              Assistant
+            </span>
+            <button onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white">
+              <X size={18} />
+            </button>
+          </div>
           
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-4 pt-6">
+          <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-4 pt-4">
             {messages.map((msg, index) => (
               <div
                 key={index}
                 className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.role === 'model' && index === 0 && (
-                   <div className="mr-2 self-end mb-1">
+                   <div className="mr-2 self-end mb-1 hidden sm:block">
                       <div className="bg-brand-dark p-1.5 rounded-full">
                         <Bot size={14} className="text-brand-gold" />
                       </div>
                    </div>
                 )}
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                  className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                     msg.role === 'user'
                       ? 'bg-brand-gold text-white rounded-br-none shadow-md'
                       : 'bg-white border border-gray-200 text-gray-800 rounded-bl-none shadow-sm'
@@ -95,7 +114,7 @@ const Chatbot: React.FC = () => {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                 <div className="mr-2 self-end mb-1">
+                 <div className="mr-2 self-end mb-1 hidden sm:block">
                       <div className="bg-brand-dark p-1.5 rounded-full">
                         <Bot size={14} className="text-brand-gold" />
                       </div>
@@ -119,13 +138,13 @@ const Chatbot: React.FC = () => {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about buying or selling..."
+                placeholder="Ask a question..."
                 className="flex-1 bg-white text-gray-900 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold shadow-inner placeholder:text-gray-400"
               />
               <button
                 type="submit"
                 disabled={isLoading || !input.trim()}
-                className="bg-brand-gold text-white p-2 rounded-full hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                className="bg-brand-gold text-white p-2 rounded-full hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm flex-shrink-0"
               >
                 <Send size={18} />
               </button>
@@ -137,13 +156,13 @@ const Chatbot: React.FC = () => {
       {/* Button & Label Container */}
       <div className="flex items-center gap-3">
         {!isOpen && (
-          <div className="bg-white text-brand-dark px-4 py-2 rounded-full shadow-lg font-bold text-sm border border-gray-100 animate-fade-in-up">
-            Let's Talk
+          <div className="hidden sm:block bg-white text-brand-dark px-4 py-2 rounded-full shadow-lg font-bold text-sm border border-gray-100 animate-fade-in-up">
+            Chat with us
           </div>
         )}
         <button
           onClick={toggleChat}
-          className="bg-gradient-to-r from-brand-gold to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center"
+          className="bg-brand-gold hover:bg-amber-700 text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center border-2 border-white/20"
           aria-label="Chat with AI"
         >
           {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
