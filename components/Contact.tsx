@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SectionId } from '../types';
 import { CONTACT_INFO } from '../constants';
-import { Mail, Phone, MapPin, Send, Loader2 } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Loader2, CheckCircle } from 'lucide-react';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -12,19 +12,33 @@ const Contact: React.FC = () => {
   });
   const [status, setStatus] = useState<'idle' | 'sending' | 'success'>('idle');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('sending');
 
-    // Simulate network delay for demo purposes
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // 1. Format the email body
+    const subject = `New Website Lead: ${formData.name}`;
+    const body = `
+Name: ${formData.name}
+Email: ${formData.email}
+Phone: ${formData.phone}
 
-    // Log data to console for verification
-    console.log("Form Submitted (Demo Mode):", formData);
+Message:
+${formData.message}
+    `.trim();
 
-    // Show success state
+    // 2. Construct the mailto link
+    // encodeURIComponent ensures special characters don't break the link
+    const mailtoUrl = `mailto:${CONTACT_INFO.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    // 3. Open the user's email client
+    window.location.href = mailtoUrl;
+
+    // 4. Show success message
     setStatus('success');
-    setFormData({ name: '', email: '', phone: '', message: '' });
+    
+    // Optional: Reset form after a delay or keep it for reference
+    // setFormData({ name: '', email: '', phone: '', message: '' });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -83,17 +97,17 @@ const Contact: React.FC = () => {
             {status === 'success' ? (
               <div className="h-full flex flex-col items-center justify-center text-center py-12 animate-fade-in-up">
                 <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
-                  <Send size={32} />
+                  <CheckCircle size={32} />
                 </div>
-                <h3 className="text-2xl font-serif font-bold mb-2">Message Sent!</h3>
-                <p className="text-gray-600 mb-6">
-                  Thank you for contacting RF Realty. Raham will be in touch with you shortly.
+                <h3 className="text-3xl font-serif font-bold mb-4 text-brand-dark">Message Sent!</h3>
+                <p className="text-gray-600 mb-8 text-lg leading-relaxed">
+                  Thank you for reaching out. Raham has received your inquiry and will get back to you shortly to discuss your real estate needs.
                 </p>
-                <div className="bg-blue-50 p-4 rounded-lg text-sm text-blue-800 mb-6">
-                  <strong>Demo Mode:</strong> The form data was captured successfully but no email was sent.
-                </div>
                 <button 
-                  onClick={() => setStatus('idle')}
+                  onClick={() => {
+                    setStatus('idle');
+                    setFormData({ name: '', email: '', phone: '', message: '' });
+                  }}
                   className="text-brand-gold font-bold underline hover:text-amber-700"
                 >
                   Send another message
@@ -158,7 +172,7 @@ const Contact: React.FC = () => {
                   className={`w-full bg-gradient-to-r from-brand-gold to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-4 px-6 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 tracking-wide ${status === 'sending' ? 'opacity-80 cursor-wait' : ''}`}
                 >
                   {status === 'sending' ? (
-                    <>Sending... <Loader2 className="animate-spin" size={18} /></>
+                    <>Opening Email... <Loader2 className="animate-spin" size={18} /></>
                   ) : (
                     <>Send Message <Send size={18} /></>
                   )}

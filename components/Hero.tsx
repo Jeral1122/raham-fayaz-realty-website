@@ -3,10 +3,6 @@ import { SectionId } from '../types';
 import { HERO_CONTENT } from '../constants';
 
 const Hero: React.FC = () => {
-  const scrollToAbout = () => {
-    document.getElementById(SectionId.ABOUT)?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
     <section id={SectionId.HOME} className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
       {/* Fixed Background Image with Overlay - bg-fixed disabled on mobile to prevent z-index glitches */}
@@ -37,12 +33,6 @@ const Hero: React.FC = () => {
             className="bg-gradient-to-r from-brand-gold to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-10 py-4 rounded-full text-lg font-bold tracking-wide transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-2xl hover:shadow-amber-600/20"
           >
             Start Your Journey
-          </button>
-          <button 
-            onClick={scrollToAbout}
-            className="border-2 border-white hover:bg-white hover:text-brand-dark text-white px-10 py-4 rounded-full text-lg font-bold tracking-wide transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl backdrop-blur-sm bg-white/5"
-          >
-            Meet Raham
           </button>
         </div>
       </div>

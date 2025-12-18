@@ -7,6 +7,9 @@ const About: React.FC = () => {
   // Process bio into paragraphs
   const paragraphs = BIO_CONTENT.split('\n').filter(p => p.trim() !== '');
 
+  // Using the hosted Cloudinary URL provided
+  const profileImageUrl = "https://res.cloudinary.com/df8hl8izr/image/upload/v1766078567/raham-fayaz.jpg_igaaus.jpg";
+
   const scrollToContact = (e: React.MouseEvent) => {
     e.preventDefault();
     document.getElementById(SectionId.CONTACT)?.scrollIntoView({ behavior: 'smooth' });
@@ -20,11 +23,13 @@ const About: React.FC = () => {
           {/* Image Side */}
           <div className="relative order-2 lg:order-1">
             <div className="absolute -top-4 -left-4 w-full h-full border-2 border-brand-gold rounded-sm z-0"></div>
+            
             <img 
-              src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=800&auto=format&fit=crop" 
+              src={profileImageUrl}
               alt={CONTACT_INFO.name} 
-              className="relative w-full h-[600px] object-cover rounded-sm shadow-xl z-10 grayscale hover:grayscale-0 transition-all duration-500"
+              className="relative w-full h-[500px] object-cover object-center rounded-sm shadow-xl z-10 transition-all duration-500 bg-gray-100"
             />
+
             <div className="absolute bottom-10 right-[-20px] bg-brand-dark text-white p-6 shadow-lg z-20 max-w-xs">
               <p className="font-serif text-2xl italic">"Honesty, integrity, and a deep understanding of the local market."</p>
             </div>
@@ -32,8 +37,8 @@ const About: React.FC = () => {
 
           {/* Text Side */}
           <div className="order-1 lg:order-2">
-            <h2 className="text-brand-gold font-bold tracking-widest uppercase text-sm mb-2">Meet Your Real Estate Agent</h2>
-            <h3 className="text-4xl font-serif font-bold text-brand-dark mb-6">Raham Fayaz</h3>
+            <h2 className="text-brand-gold font-bold tracking-widest text-sm mb-2 italic">Meet your Real estate agent</h2>
+            <h3 className="text-5xl md:text-6xl font-serif font-bold text-brand-dark mb-6">Raham Fayaz</h3>
             
             <div className="space-y-4 text-gray-600 leading-relaxed font-sans text-lg">
               {paragraphs.map((para, idx) => (
@@ -60,11 +65,14 @@ const About: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-10">
+            <div className="mt-10 space-y-4">
+              <p className="text-gray-600 text-lg leading-relaxed">
+                If you’re ready to buy, sell, or explore the Metro Detroit real estate market, I’d love to help you get started. Your dream home is just a call or message away.
+              </p>
               <a 
                 href={`#${SectionId.CONTACT}`}
                 onClick={scrollToContact}
-                className="inline-block border-b-2 border-brand-gold text-brand-gold font-bold pb-1 hover:text-amber-700 hover:border-amber-700 transition-colors text-xl cursor-pointer"
+                className="inline-block border-b-2 border-brand-gold text-brand-gold font-bold pb-1 hover:text-amber-700 hover:border-amber-700 transition-colors text-2xl cursor-pointer"
               >
                 Let's Connect &rarr;
               </a>

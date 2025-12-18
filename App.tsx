@@ -6,7 +6,6 @@ import Listings from './components/Listings';
 import Testimonials from './components/Testimonials';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
-import Chatbot from './components/Chatbot';
 
 const App: React.FC = () => {
   return (
@@ -20,7 +19,6 @@ const App: React.FC = () => {
         <Contact />
       </main>
       <Footer />
-      <Chatbot />
     </div>
   );
 };
