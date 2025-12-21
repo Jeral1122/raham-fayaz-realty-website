@@ -8,7 +8,8 @@ const Contact: React.FC = () => {
     name: '',
     email: '',
     phone: '',
-    message: ''
+    message: '',
+    consent: false
   });
   const [status, setStatus] = useState<'idle' | 'sending' | 'success'>('idle');
 
@@ -25,6 +26,8 @@ Phone: ${formData.phone}
 
 Message:
 ${formData.message}
+
+Consent Provided: ${formData.consent ? 'Yes' : 'No'}
     `.trim();
 
     // 2. Construct the mailto link
@@ -42,7 +45,13 @@ ${formData.message}
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type } = e.target;
+    const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
+    
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
 
   return (
@@ -106,7 +115,7 @@ ${formData.message}
                 <button 
                   onClick={() => {
                     setStatus('idle');
-                    setFormData({ name: '', email: '', phone: '', message: '' });
+                    setFormData({ name: '', email: '', phone: '', message: '', consent: false });
                   }}
                   className="text-brand-gold font-bold underline hover:text-amber-700"
                 >
@@ -166,6 +175,22 @@ ${formData.message}
                     placeholder="I am interested in buying a home in Canton..."
                   ></textarea>
                 </div>
+
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="consent"
+                    name="consent"
+                    checked={formData.consent}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-gold focus:ring-brand-gold cursor-pointer"
+                  />
+                  <label htmlFor="consent" className="text-xs text-gray-500 leading-snug cursor-pointer">
+                    By providing your cellular telephone, you are consenting to allow Raham Fayaz Realtor to contact you with marketing communications via voice call, AI voice call, text message, or similar automated means. To opt out, you can reply 'stop' at any time or reply 'help' for assistance. Message and data rates may apply. Message frequency may vary. For more information see our Privacy Policy
+                  </label>
+                </div>
+
                 <button
                   type="submit"
                   disabled={status === 'sending'}
