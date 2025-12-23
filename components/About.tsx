@@ -49,7 +49,7 @@ const About: React.FC = () => {
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex items-center gap-3">
                 <MapPin className="text-brand-gold" />
-                <span className="font-bold text-brand-dark">Canton Resident</span>
+                <span className="font-bold text-brand-dark">Michigan Resident</span>
               </div>
               <div className="flex items-center gap-3">
                 <CheckCircle className="text-brand-gold" />

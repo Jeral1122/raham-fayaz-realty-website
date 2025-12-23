@@ -21,7 +21,7 @@ const Hero: React.FC = () => {
           Raham Fayaz Realty
         </p>
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold mb-6 leading-tight animate-fade-in-up animate-delay-200">
-          Your Trusted Metro Detroit <br/>
+          Your Metro Detroit <br/>
           <span className="italic text-gray-300">Real Estate Expert</span>
         </h1>
         <p className="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto font-light leading-relaxed animate-fade-in-up animate-delay-500">

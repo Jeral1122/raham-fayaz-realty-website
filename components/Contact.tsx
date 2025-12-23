@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { SectionId } from '../types';
 import { CONTACT_INFO } from '../constants';
 import { Mail, Phone, MapPin, Send, Loader2, CheckCircle } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -13,13 +14,47 @@ const Contact: React.FC = () => {
   });
   const [status, setStatus] = useState<'idle' | 'sending' | 'success'>('idle');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('sending');
 
-    // 1. Format the email body
-    const subject = `New Website Lead: ${formData.name}`;
-    const body = `
+    // EmailJS Configuration
+    // TODO: Create an account at https://www.emailjs.com/
+    // 1. Create a Service (e.g., connect Gmail) -> Get Service ID
+    // 2. Create a Template -> Get Template ID
+    //    Map these variables in your template: {{name}}, {{email}}, {{phone}}, {{message}}, {{consent}}
+    // 3. Get your Public Key from Account Settings
+    const SERVICE_ID = 'YOUR_SERVICE_ID';
+    const TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+    const PUBLIC_KEY = 'YOUR_PUBLIC_KEY';
+
+    try {
+      // Attempt to send via EmailJS
+      if (SERVICE_ID !== 'YOUR_SERVICE_ID') {
+         await emailjs.send(
+            SERVICE_ID,
+            TEMPLATE_ID,
+            {
+               to_name: 'Raham Fayaz',
+               from_name: formData.name,
+               from_email: formData.email,
+               phone: formData.phone,
+               message: formData.message,
+               consent: formData.consent ? 'Yes' : 'No'
+            },
+            PUBLIC_KEY
+         );
+         setStatus('success');
+      } else {
+         // If keys are not set up yet, throw error to trigger fallback
+         throw new Error("EmailJS keys not configured");
+      }
+    } catch (error) {
+       console.log("Direct email failed or not configured, falling back to mailto.", error);
+       
+       // Fallback to Mailto if EmailJS fails or isn't configured
+       const subject = `New Website Lead: ${formData.name}`;
+       const body = `
 Name: ${formData.name}
 Email: ${formData.email}
 Phone: ${formData.phone}
@@ -28,20 +63,15 @@ Message:
 ${formData.message}
 
 Consent Provided: ${formData.consent ? 'Yes' : 'No'}
-    `.trim();
-
-    // 2. Construct the mailto link
-    // encodeURIComponent ensures special characters don't break the link
-    const mailtoUrl = `mailto:${CONTACT_INFO.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-    // 3. Open the user's email client
-    window.location.href = mailtoUrl;
-
-    // 4. Show success message
-    setStatus('success');
+       `.trim();
+   
+       const mailtoUrl = `mailto:${CONTACT_INFO.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+       window.location.href = mailtoUrl;
+       setStatus('success');
+    }
     
-    // Optional: Reset form after a delay or keep it for reference
-    // setFormData({ name: '', email: '', phone: '', message: '' });
+    // Optional: Reset form after success
+    // setFormData({ name: '', email: '', phone: '', message: '', consent: false });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -197,7 +227,7 @@ Consent Provided: ${formData.consent ? 'Yes' : 'No'}
                   className={`w-full bg-gradient-to-r from-brand-gold to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-4 px-6 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 tracking-wide ${status === 'sending' ? 'opacity-80 cursor-wait' : ''}`}
                 >
                   {status === 'sending' ? (
-                    <>Opening Email... <Loader2 className="animate-spin" size={18} /></>
+                    <>Sending... <Loader2 className="animate-spin" size={18} /></>
                   ) : (
                     <>Send Message <Send size={18} /></>
                   )}

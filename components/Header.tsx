@@ -3,7 +3,11 @@ import { Menu, X, Phone, Mail } from 'lucide-react';
 import { CONTACT_INFO } from '../constants';
 import { SectionId } from '../types';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  currentView: 'home' | 'testimonials' | 'listings';
+}
+
+const Header: React.FC<HeaderProps> = ({ currentView }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -15,34 +19,42 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToSection = (id: SectionId) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setIsMobileMenuOpen(false);
+  const navigateTo = (id: SectionId) => {
+    if (id === SectionId.TESTIMONIALS) {
+      window.dispatchEvent(new CustomEvent('changeView', { detail: { view: 'testimonials' } }));
+    } else if (id === SectionId.LISTINGS) {
+      // Navigate to the dedicated Listings page
+      window.dispatchEvent(new CustomEvent('changeView', { detail: { view: 'listings' } }));
+    } else {
+      window.dispatchEvent(new CustomEvent('changeView', { detail: { view: 'home', sectionId: id } }));
     }
+    setIsMobileMenuOpen(false);
   };
 
   const navLinks = [
     { label: 'Home', id: SectionId.HOME },
     { label: 'About', id: SectionId.ABOUT },
     { label: 'Listings', id: SectionId.LISTINGS },
-    { label: 'Testimonials', id: SectionId.TESTIMONIALS },
+    { label: 'Reviews', id: SectionId.TESTIMONIALS },
     { label: 'Contact', id: SectionId.CONTACT },
   ];
+
+  // Determine if we should use the "solid" theme (white background, dark text)
+  // This is active if the user has scrolled down OR if we are on a page other than Home
+  const useSolidTheme = isScrolled || currentView !== 'home';
 
   return (
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-6'
+        useSolidTheme ? 'bg-white shadow-md py-3' : 'bg-transparent py-6'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <div className="flex items-center cursor-pointer" onClick={() => scrollToSection(SectionId.HOME)}>
+          <div className="flex items-center cursor-pointer" onClick={() => navigateTo(SectionId.HOME)}>
             <div className={`text-2xl font-serif font-bold tracking-wider border-2 px-3 py-1 ${
-              isScrolled ? 'border-brand-dark text-brand-dark' : 'border-white text-white'
+              useSolidTheme ? 'border-brand-dark text-brand-dark' : 'border-white text-white'
             }`}>
               RF <span className="text-brand-gold">REALTY</span>
             </div>
@@ -53,9 +65,9 @@ const Header: React.FC = () => {
             {navLinks.map((link) => (
               <button
                 key={link.id}
-                onClick={() => scrollToSection(link.id)}
+                onClick={() => navigateTo(link.id)}
                 className={`text-sm font-medium uppercase tracking-widest hover:text-brand-gold transition-colors ${
-                  isScrolled ? 'text-gray-800' : 'text-white'
+                  useSolidTheme ? 'text-gray-800' : 'text-white'
                 }`}
               >
                 {link.label}
@@ -86,7 +98,7 @@ const Header: React.FC = () => {
           {navLinks.map((link) => (
             <button
               key={link.id}
-              onClick={() => scrollToSection(link.id)}
+              onClick={() => navigateTo(link.id)}
               className="text-left text-gray-800 font-medium py-2 border-b border-gray-100"
             >
               {link.label}

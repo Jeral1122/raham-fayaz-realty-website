@@ -1,17 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CONTACT_INFO } from '../constants';
 import { SectionId } from '../types';
 import { Facebook, Instagram, Linkedin } from 'lucide-react';
 
 const Footer: React.FC = () => {
+  const handleNavClick = (id: SectionId) => {
+    if (id === SectionId.TESTIMONIALS) {
+        window.dispatchEvent(new CustomEvent('changeView', { detail: { view: 'testimonials' } }));
+    } else if (id === SectionId.LISTINGS) {
+        window.dispatchEvent(new CustomEvent('changeView', { detail: { view: 'listings' } }));
+    } else {
+        window.dispatchEvent(new CustomEvent('changeView', { detail: { view: 'home', sectionId: id } }));
+    }
+  };
+
   return (
     <footer className="bg-gray-900 text-white border-t border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           
           {/* Brand */}
           <div>
-            <div className="mb-4 cursor-pointer" onClick={() => document.getElementById(SectionId.HOME)?.scrollIntoView({ behavior: 'smooth'})}>
+            <div className="mb-4 cursor-pointer" onClick={() => handleNavClick(SectionId.HOME)}>
               <div className="inline-block text-2xl font-serif font-bold tracking-wider border-2 border-white text-white px-3 py-1">
                 RF <span className="text-brand-gold">REALTY</span>
               </div>
@@ -25,11 +35,11 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-lg font-bold mb-4 border-l-4 border-brand-gold pl-3">Navigation</h4>
             <ul className="space-y-2 text-gray-400">
-              <li><button onClick={() => document.getElementById(SectionId.HOME)?.scrollIntoView({ behavior: 'smooth'})} className="hover:text-white transition-colors">Home</button></li>
-              <li><button onClick={() => document.getElementById(SectionId.ABOUT)?.scrollIntoView({ behavior: 'smooth'})} className="hover:text-white transition-colors">About Raham</button></li>
-              <li><button onClick={() => document.getElementById(SectionId.LISTINGS)?.scrollIntoView({ behavior: 'smooth'})} className="hover:text-white transition-colors">Properties</button></li>
-              <li><button onClick={() => document.getElementById(SectionId.TESTIMONIALS)?.scrollIntoView({ behavior: 'smooth'})} className="hover:text-white transition-colors">Testimonials</button></li>
-              <li><button onClick={() => document.getElementById(SectionId.CONTACT)?.scrollIntoView({ behavior: 'smooth'})} className="hover:text-white transition-colors">Contact</button></li>
+              <li><button onClick={() => handleNavClick(SectionId.HOME)} className="hover:text-white transition-colors">Home</button></li>
+              <li><button onClick={() => handleNavClick(SectionId.ABOUT)} className="hover:text-white transition-colors">About Raham</button></li>
+              <li><button onClick={() => handleNavClick(SectionId.LISTINGS)} className="hover:text-white transition-colors">Properties</button></li>
+              <li><button onClick={() => handleNavClick(SectionId.TESTIMONIALS)} className="hover:text-white transition-colors">Reviews</button></li>
+              <li><button onClick={() => handleNavClick(SectionId.CONTACT)} className="hover:text-white transition-colors">Contact</button></li>
             </ul>
           </div>
 
@@ -78,6 +88,29 @@ const Footer: React.FC = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* Brokerage Compliance Section */}
+        <div className="border-t border-gray-800 py-8">
+            <div className="bg-gray-800/50 rounded-lg p-6 flex flex-col md:flex-row items-center justify-center gap-8 text-center md:text-left border border-gray-700 max-w-4xl mx-auto">
+                <div className="p-4 bg-white rounded-lg flex-shrink-0 shadow-lg">
+                    <img 
+                       src="https://res.cloudinary.com/df8hl8izr/image/upload/v1766502530/clients_first_kbsjsy.png"
+                       alt="Clients First Realtors"
+                       className="h-24 md:h-32 w-auto object-contain"
+                    />
+                </div>
+                
+                <div className="hidden md:block w-px h-24 bg-gray-600"></div>
+
+                <div className="space-y-2 text-gray-300">
+                    <h5 className="font-bold text-white text-xl">Clients First, Realtors</h5>
+                    <p className="text-base">43050 Ford Rd. Ste 130 Canton , MI 48187</p>
+                    <p className="text-base">
+                        <a href="tel:734-981-2900" className="hover:text-brand-gold transition-colors font-semibold">734-981-2900</a>
+                    </p>
+                </div>
+            </div>
         </div>
 
         <div className="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm flex flex-col md:flex-row justify-between items-center">
