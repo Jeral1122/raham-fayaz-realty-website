@@ -125,17 +125,6 @@ const Testimonials: React.FC = () => {
                 </div>
               ))}
             </div>
-
-            {/* Action Button */}
-            <div className="mt-20">
-              <button 
-                onClick={goToReviewPage}
-                className="inline-flex items-center gap-2 text-brand-gold font-bold border-2 border-brand-gold px-8 py-3 rounded-full hover:bg-brand-gold hover:text-white transition-all duration-300 shadow-sm"
-              >
-                <PlusCircle size={20} />
-                Leave Another Review
-              </button>
-            </div>
           </>
         )}
       </div>
