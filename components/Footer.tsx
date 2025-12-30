@@ -114,8 +114,19 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm flex flex-col md:flex-row justify-between items-center">
-          <p>&copy; {new Date().getFullYear()} {CONTACT_INFO.brandName}. All rights reserved.</p>
-          <div className="mt-4 md:mt-0 space-x-4">
+          <div className="flex flex-col md:flex-row items-center gap-2 mb-4 md:mb-0">
+             <p>&copy; {new Date().getFullYear()} {CONTACT_INFO.brandName}. All rights reserved.</p>
+             <span className="hidden md:inline text-gray-700">|</span>
+             <a 
+                href="https://geosolutions.com.pk" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-brand-gold transition-colors font-medium"
+             >
+                Powered by Geo Solutions
+             </a>
+          </div>
+          <div className="space-x-4">
             <span className="hover:text-gray-300 cursor-pointer">Privacy Policy</span>
             <span className="hover:text-gray-300 cursor-pointer">Terms of Service</span>
           </div>

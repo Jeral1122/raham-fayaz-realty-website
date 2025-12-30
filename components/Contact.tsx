@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { SectionId } from '../types';
 import { CONTACT_INFO } from '../constants';
 import { Mail, Phone, MapPin, Send, Loader2, CheckCircle } from 'lucide-react';
-import emailjs from '@emailjs/browser';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -18,41 +17,31 @@ const Contact: React.FC = () => {
     e.preventDefault();
     setStatus('sending');
 
-    // EmailJS Configuration
-    // TODO: Create an account at https://www.emailjs.com/
-    // 1. Create a Service (e.g., connect Gmail) -> Get Service ID
-    // 2. Create a Template -> Get Template ID
-    //    Map these variables in your template: {{name}}, {{email}}, {{phone}}, {{message}}, {{consent}}
-    // 3. Get your Public Key from Account Settings
-    const SERVICE_ID = 'YOUR_SERVICE_ID';
-    const TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
-    const PUBLIC_KEY = 'YOUR_PUBLIC_KEY';
-
     try {
-      // Attempt to send via EmailJS
-      if (SERVICE_ID !== 'YOUR_SERVICE_ID') {
-         await emailjs.send(
-            SERVICE_ID,
-            TEMPLATE_ID,
-            {
-               to_name: 'Raham Fayaz',
-               from_name: formData.name,
-               from_email: formData.email,
-               phone: formData.phone,
-               message: formData.message,
-               consent: formData.consent ? 'Yes' : 'No'
-            },
-            PUBLIC_KEY
-         );
-         setStatus('success');
+      // Send data to Webhook
+      const response = await fetch('https://n8n-production-36a4.up.railway.app/webhook/df4405c7-def5-4300-bc76-4949f6272fde', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            message: formData.message,
+            consent: formData.consent,
+            source: 'website_contact_form',
+            timestamp: new Date().toISOString()
+         })
+      });
+
+      if (response.ok) {
+        setStatus('success');
       } else {
-         // If keys are not set up yet, throw error to trigger fallback
-         throw new Error("EmailJS keys not configured");
+        throw new Error('Webhook submission returned error status');
       }
+
     } catch (error) {
-       console.log("Direct email failed or not configured, falling back to mailto.", error);
+       console.log("Webhook failed, falling back to mailto.", error);
        
-       // Fallback to Mailto if EmailJS fails or isn't configured
        const subject = `New Website Lead: ${formData.name}`;
        const body = `
 Name: ${formData.name}
@@ -69,9 +58,6 @@ Consent Provided: ${formData.consent ? 'Yes' : 'No'}
        window.location.href = mailtoUrl;
        setStatus('success');
     }
-    
-    // Optional: Reset form after success
-    // setFormData({ name: '', email: '', phone: '', message: '', consent: false });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -82,6 +68,26 @@ Consent Provided: ${formData.consent ? 'Yes' : 'No'}
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+  };
+
+  // Determine if a field is valid
+  // Returns false if empty or invalid, prompting the red error state
+  const isFieldValid = (field: string) => {
+    if (field === 'name') return formData.name.trim().length > 0;
+    if (field === 'email') return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
+    if (field === 'phone') return formData.phone.trim().length > 0;
+    if (field === 'message') return formData.message.trim().length > 0;
+    return true; 
+  };
+
+  // Helper to generate input classes based on validation state
+  const getInputClass = (fieldName: string) => {
+    const isValid = isFieldValid(fieldName);
+    const baseClass = "w-full px-4 py-3 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-1 transition-all placeholder:text-gray-400";
+    
+    return isValid 
+      ? `${baseClass} border-gray-300 focus:border-brand-gold focus:ring-brand-gold`
+      : `${baseClass} border-red-300 focus:border-red-500 focus:ring-red-200`;
   };
 
   return (
@@ -155,7 +161,9 @@ Consent Provided: ${formData.consent ? 'Yes' : 'No'}
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-bold mb-2 text-gray-800">Full Name</label>
+                  <label htmlFor="name" className="block text-sm font-bold mb-2 text-gray-800">
+                    Full Name {!isFieldValid('name') && <span className="text-red-500 text-lg ml-1" title="Required">*</span>}
+                  </label>
                   <input
                     type="text"
                     id="name"
@@ -163,12 +171,14 @@ Consent Provided: ${formData.consent ? 'Yes' : 'No'}
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-all placeholder:text-gray-400"
+                    className={getInputClass('name')}
                     placeholder="John Doe"
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-bold mb-2 text-gray-800">Email Address</label>
+                  <label htmlFor="email" className="block text-sm font-bold mb-2 text-gray-800">
+                    Email Address {!isFieldValid('email') && <span className="text-red-500 text-lg ml-1" title="Valid email required">*</span>}
+                  </label>
                   <input
                     type="email"
                     id="email"
@@ -176,24 +186,29 @@ Consent Provided: ${formData.consent ? 'Yes' : 'No'}
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-all placeholder:text-gray-400"
+                    className={getInputClass('email')}
                     placeholder="john@example.com"
                   />
                 </div>
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-bold mb-2 text-gray-800">Phone Number</label>
+                  <label htmlFor="phone" className="block text-sm font-bold mb-2 text-gray-800">
+                    Phone Number {!isFieldValid('phone') && <span className="text-red-500 text-lg ml-1" title="Required">*</span>}
+                  </label>
                   <input
                     type="tel"
                     id="phone"
                     name="phone"
+                    required
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-all placeholder:text-gray-400"
+                    className={getInputClass('phone')}
                     placeholder="(555) 123-4567"
                   />
                 </div>
                 <div>
-                  <label htmlFor="message" className="block text-sm font-bold mb-2 text-gray-800">Message</label>
+                  <label htmlFor="message" className="block text-sm font-bold mb-2 text-gray-800">
+                    Message {!isFieldValid('message') && <span className="text-red-500 text-lg ml-1" title="Required">*</span>}
+                  </label>
                   <textarea
                     id="message"
                     name="message"
@@ -201,7 +216,7 @@ Consent Provided: ${formData.consent ? 'Yes' : 'No'}
                     required
                     value={formData.message}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-all placeholder:text-gray-400"
+                    className={getInputClass('message')}
                     placeholder="I am interested in buying a home in Canton..."
                   ></textarea>
                 </div>
@@ -223,7 +238,7 @@ Consent Provided: ${formData.consent ? 'Yes' : 'No'}
 
                 <button
                   type="submit"
-                  disabled={status === 'sending'}
+                  disabled={status === 'sending' || !formData.consent}
                   className={`w-full bg-gradient-to-r from-brand-gold to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-4 px-6 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 tracking-wide ${status === 'sending' ? 'opacity-80 cursor-wait' : ''}`}
                 >
                   {status === 'sending' ? (

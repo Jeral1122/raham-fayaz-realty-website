@@ -23,7 +23,6 @@ const Header: React.FC<HeaderProps> = ({ currentView }) => {
     if (id === SectionId.TESTIMONIALS) {
       window.dispatchEvent(new CustomEvent('changeView', { detail: { view: 'testimonials' } }));
     } else if (id === SectionId.LISTINGS) {
-      // Navigate to the dedicated Listings page
       window.dispatchEvent(new CustomEvent('changeView', { detail: { view: 'listings' } }));
     } else {
       window.dispatchEvent(new CustomEvent('changeView', { detail: { view: 'home', sectionId: id } }));
@@ -49,52 +48,63 @@ const Header: React.FC<HeaderProps> = ({ currentView }) => {
         useSolidTheme ? 'bg-white shadow-md py-3' : 'bg-transparent py-6'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center">
-          {/* Logo */}
-          <div className="flex items-center cursor-pointer" onClick={() => navigateTo(SectionId.HOME)}>
-            <div className={`text-2xl font-serif font-bold tracking-wider border-2 px-3 py-1 ${
-              useSolidTheme ? 'border-brand-dark text-brand-dark' : 'border-white text-white'
-            }`}>
-              RF <span className="text-brand-gold">REALTY</span>
-            </div>
+      <div className="w-full px-6 md:px-12 flex justify-between items-center">
+        
+        {/* Left: Logo Group + Brand Name */}
+        <div className="flex items-center cursor-pointer z-50" onClick={() => navigateTo(SectionId.HOME)}>
+          {/* Box Logo */}
+          <div className={`text-2xl font-serif font-bold tracking-wider border-2 px-3 py-1 ${
+            useSolidTheme ? 'border-brand-dark text-brand-dark' : 'border-white text-white'
+          }`}>
+            RF <span className="text-brand-gold">REALTY</span>
           </div>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex space-x-6 lg:space-x-8 items-center">
-            {navLinks.map((link) => (
-              <button
-                key={link.id}
-                onClick={() => navigateTo(link.id)}
-                className={`text-sm font-medium uppercase tracking-widest hover:text-brand-gold transition-colors ${
-                  useSolidTheme ? 'text-gray-800' : 'text-white'
-                }`}
-              >
-                {link.label}
-              </button>
-            ))}
-            <a 
-              href={`tel:${CONTACT_INFO.phone}`}
-              className="bg-gradient-to-r from-brand-gold to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-2 rounded-full font-bold text-sm transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center gap-2"
-            >
-              <Phone size={16} />
-              {CONTACT_INFO.phone}
-            </a>
-          </nav>
+          {/* Brand Name Text - Positioned to the right of the logo with extra margin */}
+          <span className={`text-xl font-serif font-bold tracking-wide hidden md:block ml-12 ${
+              useSolidTheme ? 'text-brand-dark' : 'text-white'
+          }`}>
+              Raham Fayaz Realty
+          </span>
+        </div>
 
-          {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden text-brand-gold"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
+        {/* Right: Navigation & Actions */}
+        <div className="flex items-center gap-6">
+            {/* Desktop Nav */}
+            <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
+              {navLinks.map((link) => (
+                  <button
+                  key={link.id}
+                  onClick={() => navigateTo(link.id)}
+                  className={`text-sm font-medium uppercase tracking-widest hover:text-brand-gold transition-colors ${
+                      useSolidTheme ? 'text-gray-800' : 'text-white'
+                  }`}
+                  >
+                  {link.label}
+                  </button>
+              ))}
+              <a 
+                  href={`tel:${CONTACT_INFO.phone}`}
+                  className="bg-gradient-to-r from-brand-gold to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-5 py-2 rounded-full font-bold text-sm transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center gap-2"
+              >
+                  <Phone size={16} />
+                  <span className="hidden xl:inline">{CONTACT_INFO.phone}</span>
+                  <span className="xl:hidden">Call</span>
+              </a>
+            </nav>
+
+            {/* Mobile Menu Button */}
+            <button 
+                className="lg:hidden text-brand-gold z-50"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+                {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-4 flex flex-col space-y-4">
+        <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-4 flex flex-col space-y-4 animate-fade-in-up border-t border-gray-100">
           {navLinks.map((link) => (
             <button
               key={link.id}
