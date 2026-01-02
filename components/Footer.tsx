@@ -95,9 +95,9 @@ const Footer: React.FC = () => {
             <div className="bg-gray-800/50 rounded-lg p-6 flex flex-col md:flex-row items-center justify-center gap-8 text-center md:text-left border border-gray-700 max-w-4xl mx-auto">
                 <div className="p-4 bg-white rounded-lg flex-shrink-0 shadow-lg">
                     <img 
-                       src="https://res.cloudinary.com/df8hl8izr/image/upload/v1766502530/clients_first_kbsjsy.png"
+                       src="https://res.cloudinary.com/df8hl8izr/image/upload/v1767355313/WhatsApp_Image_2025-12-31_at_18.51.03_k6wyna.jpg"
                        alt="Clients First Realtors"
-                       className="h-24 md:h-32 w-auto object-contain"
+                       className="h-32 md:h-48 w-auto object-contain"
                     />
                 </div>
                 

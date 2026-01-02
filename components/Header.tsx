@@ -60,7 +60,7 @@ const Header: React.FC<HeaderProps> = ({ currentView }) => {
           </div>
 
           {/* Brand Name Text - Positioned to the right of the logo with extra margin */}
-          <span className={`text-xl font-serif font-bold tracking-wide hidden md:block ml-12 ${
+          <span className={`font-serif font-bold tracking-wide ml-3 md:ml-12 text-sm md:text-xl ${
               useSolidTheme ? 'text-brand-dark' : 'text-white'
           }`}>
               Raham Fayaz Realty
