@@ -93,13 +93,18 @@ const Footer: React.FC = () => {
         {/* Brokerage Compliance Section */}
         <div className="border-t border-gray-800 py-8">
             <div className="bg-gray-800/50 rounded-lg p-6 flex flex-col md:flex-row items-center justify-center gap-8 text-center md:text-left border border-gray-700 max-w-4xl mx-auto">
-                <div className="p-4 bg-white rounded-lg flex-shrink-0 shadow-lg">
+                <a 
+                  href="https://www.clientsfirstrealtors.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-4 bg-white rounded-lg flex-shrink-0 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 block"
+                >
                     <img 
                        src="https://res.cloudinary.com/df8hl8izr/image/upload/v1767355313/WhatsApp_Image_2025-12-31_at_18.51.03_k6wyna.jpg"
                        alt="Clients First Realtors"
                        className="h-32 md:h-48 w-auto object-contain"
                     />
-                </div>
+                </a>
                 
                 <div className="hidden md:block w-px h-24 bg-gray-600"></div>
 
