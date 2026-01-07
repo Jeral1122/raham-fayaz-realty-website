@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CONTACT_INFO } from '../constants';
 import { SectionId } from '../types';
-import { Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Facebook, Instagram, Youtube } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const handleNavClick = (id: SectionId) => {
@@ -12,6 +12,16 @@ const Footer: React.FC = () => {
     } else {
         window.dispatchEvent(new CustomEvent('changeView', { detail: { view: 'home', sectionId: id } }));
     }
+  };
+
+  const handlePrivacyClick = () => {
+    window.dispatchEvent(new CustomEvent('changeView', { detail: { view: 'privacy' } }));
+    window.scrollTo(0, 0);
+  };
+
+  const handleTermsClick = () => {
+    window.dispatchEvent(new CustomEvent('changeView', { detail: { view: 'terms' } }));
+    window.scrollTo(0, 0);
   };
 
   return (
@@ -77,13 +87,13 @@ const Footer: React.FC = () => {
                 <Instagram size={20} />
               </a>
               <a 
-                href="https://www.linkedin.com" 
+                href="https://www.youtube.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-brand-gold transition-colors"
-                aria-label="LinkedIn"
+                aria-label="YouTube"
               >
-                <Linkedin size={20} />
+                <Youtube size={20} />
               </a>
             </div>
           </div>
@@ -132,8 +142,8 @@ const Footer: React.FC = () => {
              </a>
           </div>
           <div className="space-x-4">
-            <span className="hover:text-gray-300 cursor-pointer">Privacy Policy</span>
-            <span className="hover:text-gray-300 cursor-pointer">Terms of Service</span>
+            <button onClick={handlePrivacyClick} className="hover:text-gray-300 cursor-pointer transition-colors">Privacy Policy</button>
+            <button onClick={handleTermsClick} className="hover:text-gray-300 cursor-pointer transition-colors">Terms of Service</button>
           </div>
         </div>
       </div>

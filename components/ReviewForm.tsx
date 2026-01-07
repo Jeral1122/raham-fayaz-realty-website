@@ -71,6 +71,26 @@ const ReviewForm: React.FC = () => {
     }));
   };
 
+  // Determine if a field is valid
+  const isFieldValid = (field: string) => {
+    if (field === 'rating') return rating > 0;
+    if (field === 'title') return formData.title.trim().length > 0;
+    if (field === 'review') return formData.review.trim().length > 0;
+    if (field === 'name') return formData.name.trim().length > 0;
+    if (field === 'email') return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
+    return true; 
+  };
+
+  // Helper to generate input classes based on validation state
+  const getInputClass = (fieldName: string) => {
+    const isValid = isFieldValid(fieldName);
+    const baseClass = "w-full px-4 py-3 bg-white text-gray-900 border rounded-md focus:outline-none focus:ring-1 transition-all placeholder:text-gray-400";
+    
+    return isValid 
+      ? `${baseClass} border-gray-300 focus:border-brand-gold focus:ring-brand-gold`
+      : `${baseClass} border-red-300 focus:border-red-500 focus:ring-red-200`;
+  };
+
   if (status === 'success') {
     return (
       <div className="p-12 text-center animate-fade-in-up">
@@ -106,7 +126,9 @@ const ReviewForm: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Rating */}
         <div>
-          <label className="block text-gray-700 font-bold mb-2 text-sm">Your overall rating</label>
+          <label className="block text-gray-700 font-bold mb-2 text-sm">
+            Your overall rating {!isFieldValid('rating') && <span className="text-red-500 text-lg ml-1" title="Required">*</span>}
+          </label>
           <div className="flex gap-1">
             {[...Array(5)].map((_, index) => {
               const starValue = index + 1;
@@ -134,7 +156,9 @@ const ReviewForm: React.FC = () => {
 
         {/* Title */}
         <div>
-          <label htmlFor="title" className="block text-gray-700 font-bold mb-2 text-sm">Title of your review</label>
+          <label htmlFor="title" className="block text-gray-700 font-bold mb-2 text-sm">
+            Title of your review {!isFieldValid('title') && <span className="text-red-500 text-lg ml-1" title="Required">*</span>}
+          </label>
           <input
             type="text"
             id="title"
@@ -143,13 +167,15 @@ const ReviewForm: React.FC = () => {
             value={formData.title}
             onChange={handleChange}
             placeholder="Summarize your experience"
-            className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-gold focus:border-brand-gold placeholder:text-gray-400"
+            className={getInputClass('title')}
           />
         </div>
 
         {/* Review */}
         <div>
-          <label htmlFor="review" className="block text-gray-700 font-bold mb-2 text-sm">Your review</label>
+          <label htmlFor="review" className="block text-gray-700 font-bold mb-2 text-sm">
+            Your review {!isFieldValid('review') && <span className="text-red-500 text-lg ml-1" title="Required">*</span>}
+          </label>
           <textarea
             id="review"
             name="review"
@@ -158,13 +184,15 @@ const ReviewForm: React.FC = () => {
             value={formData.review}
             onChange={handleChange}
             placeholder="Tell us about your experience working with RF Realty..."
-            className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-gold focus:border-brand-gold placeholder:text-gray-400 resize-none"
+            className={`${getInputClass('review')} resize-none`}
           ></textarea>
         </div>
 
         {/* Name */}
         <div>
-          <label htmlFor="form-name" className="block text-gray-700 font-bold mb-2 text-sm">Your name</label>
+          <label htmlFor="form-name" className="block text-gray-700 font-bold mb-2 text-sm">
+            Your name {!isFieldValid('name') && <span className="text-red-500 text-lg ml-1" title="Required">*</span>}
+          </label>
           <input
             type="text"
             id="form-name"
@@ -173,13 +201,15 @@ const ReviewForm: React.FC = () => {
             value={formData.name}
             onChange={handleChange}
             placeholder="John Doe"
-            className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-gold focus:border-brand-gold placeholder:text-gray-400"
+            className={getInputClass('name')}
           />
         </div>
 
         {/* Email */}
         <div>
-          <label htmlFor="form-email" className="block text-gray-700 font-bold mb-2 text-sm">Your email</label>
+          <label htmlFor="form-email" className="block text-gray-700 font-bold mb-2 text-sm">
+            Your email {!isFieldValid('email') && <span className="text-red-500 text-lg ml-1" title="Valid email required">*</span>}
+          </label>
           <input
             type="email"
             id="form-email"
@@ -188,7 +218,7 @@ const ReviewForm: React.FC = () => {
             value={formData.email}
             onChange={handleChange}
             placeholder="john@example.com"
-            className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-gold focus:border-brand-gold placeholder:text-gray-400"
+            className={getInputClass('email')}
           />
         </div>
 
@@ -206,7 +236,7 @@ const ReviewForm: React.FC = () => {
             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
           </label>
           <span className="text-gray-700 text-sm">
-            This review is based on my own experience and is my genuine opinion.
+            This review is based on my own experience and is my genuine opinion. <span className="text-red-500">*</span>
           </span>
         </div>
 

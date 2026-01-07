@@ -7,13 +7,15 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import TestimonialsPage from './components/TestimonialsPage';
 import ListingsPage from './components/ListingsPage';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsOfService from './components/TermsOfService';
 
 const App: React.FC = () => {
-  const [view, setView] = useState<'home' | 'testimonials' | 'listings'>('home');
+  const [view, setView] = useState<'home' | 'testimonials' | 'listings' | 'privacy' | 'terms'>('home');
 
   // Listen for navigation events from the Header
   useEffect(() => {
-    const handleViewChange = (e: CustomEvent<{ view: 'home' | 'testimonials' | 'listings', sectionId?: string }>) => {
+    const handleViewChange = (e: CustomEvent<{ view: 'home' | 'testimonials' | 'listings' | 'privacy' | 'terms', sectionId?: string }>) => {
       setView(e.detail.view);
       
       // If switching back to home and a section is specified, scroll to it
@@ -49,6 +51,8 @@ const App: React.FC = () => {
         )}
         {view === 'testimonials' && <TestimonialsPage />}
         {view === 'listings' && <ListingsPage />}
+        {view === 'privacy' && <PrivacyPolicy />}
+        {view === 'terms' && <TermsOfService />}
       </main>
       <Footer />
     </div>

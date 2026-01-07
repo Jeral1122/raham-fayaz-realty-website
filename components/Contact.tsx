@@ -18,19 +18,24 @@ const Contact: React.FC = () => {
     setStatus('sending');
 
     try {
-      // Send data to Webhook
+      // Use URLSearchParams to send data as application/x-www-form-urlencoded
+      // This avoids the CORS preflight (OPTIONS) request that often fails with simple webhooks
+      // when using application/json
+      const payload = new URLSearchParams();
+      payload.append('name', formData.name);
+      payload.append('email', formData.email);
+      payload.append('phone', formData.phone);
+      payload.append('message', formData.message);
+      payload.append('consent', String(formData.consent));
+      payload.append('source', 'website_contact_form');
+      payload.append('timestamp', new Date().toISOString());
+
       const response = await fetch('https://n8n-production-36a4.up.railway.app/webhook/df4405c7-def5-4300-bc76-4949f6272fde', {
          method: 'POST',
-         headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            message: formData.message,
-            consent: formData.consent,
-            source: 'website_contact_form',
-            timestamp: new Date().toISOString()
-         })
+         headers: { 
+           'Content-Type': 'application/x-www-form-urlencoded' 
+         },
+         body: payload
       });
 
       if (response.ok) {
@@ -75,7 +80,8 @@ Consent Provided: ${formData.consent ? 'Yes' : 'No'}
   const isFieldValid = (field: string) => {
     if (field === 'name') return formData.name.trim().length > 0;
     if (field === 'email') return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
-    if (field === 'phone') return formData.phone.trim().length > 0;
+    // Phone is now optional, so it is always considered valid for styling purposes
+    if (field === 'phone') return true; 
     if (field === 'message') return formData.message.trim().length > 0;
     return true; 
   };
@@ -192,13 +198,12 @@ Consent Provided: ${formData.consent ? 'Yes' : 'No'}
                 </div>
                 <div>
                   <label htmlFor="phone" className="block text-sm font-bold mb-2 text-gray-800">
-                    Phone Number {!isFieldValid('phone') && <span className="text-red-500 text-lg ml-1" title="Required">*</span>}
+                    Phone Number
                   </label>
                   <input
                     type="tel"
                     id="phone"
                     name="phone"
-                    required
                     value={formData.phone}
                     onChange={handleChange}
                     className={getInputClass('phone')}
@@ -232,7 +237,7 @@ Consent Provided: ${formData.consent ? 'Yes' : 'No'}
                     className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-gold focus:ring-brand-gold cursor-pointer"
                   />
                   <label htmlFor="consent" className="text-xs text-gray-500 leading-snug cursor-pointer">
-                    By providing your cellular telephone, you are consenting to allow Raham Fayaz Realtor to contact you with marketing communications via voice call, AI voice call, text message, or similar automated means. To opt out, you can reply 'stop' at any time or reply 'help' for assistance. Message and data rates may apply. Message frequency may vary. For more information see our Privacy Policy
+                    By providing your cellular telephone, you are consenting to allow Raham Fayaz Realtor to contact you with marketing communications via voice call, AI voice call, text message, or similar automated means. To opt out, you can reply 'stop' at any time or reply 'help' for assistance. Message and data rates may apply. Message frequency may vary. For more information see our <button type="button" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('changeView', { detail: { view: 'privacy' } })); window.scrollTo(0,0); }} className="text-brand-gold underline hover:text-amber-700">Privacy Policy</button>
                   </label>
                 </div>
 

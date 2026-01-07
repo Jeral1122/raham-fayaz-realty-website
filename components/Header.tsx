@@ -4,7 +4,7 @@ import { CONTACT_INFO } from '../constants';
 import { SectionId } from '../types';
 
 interface HeaderProps {
-  currentView: 'home' | 'testimonials' | 'listings';
+  currentView: 'home' | 'testimonials' | 'listings' | 'privacy' | 'terms';
 }
 
 const Header: React.FC<HeaderProps> = ({ currentView }) => {
